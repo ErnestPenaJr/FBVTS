@@ -100,14 +100,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [state])
 
-  // Apply accessible font scaling at the document root.
+  // Apply accessible font scaling at the document root. The default
+  // ("normal") is intentionally a bit larger than a typical web baseline so
+  // it's comfortable for older volunteers, while "compact" lets anyone who
+  // prefers a denser layout dial it back. Because all spacing uses rem, this
+  // scales fonts, forms, buttons, and gaps together.
   useEffect(() => {
-    const px =
-      state.settings.fontScale === 'xlarge'
-        ? '22px'
-        : state.settings.fontScale === 'large'
-          ? '19px'
-          : '16px'
+    const px = {
+      compact: '16px',
+      normal: '18px',
+      large: '20px',
+      xlarge: '23px',
+    }[state.settings.fontScale]
     document.documentElement.style.fontSize = px
   }, [state.settings.fontScale])
 

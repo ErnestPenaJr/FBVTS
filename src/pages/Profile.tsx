@@ -32,9 +32,10 @@ export function Profile() {
   }
 
   const fontOptions: { value: FontScale; label: string }[] = [
-    { value: 'normal', label: 'Normal' },
+    { value: 'compact', label: 'Compact' },
+    { value: 'normal', label: 'Default' },
     { value: 'large', label: 'Large' },
-    { value: 'xlarge', label: 'Extra large' },
+    { value: 'xlarge', label: 'Largest' },
   ]
 
   return (
@@ -131,12 +132,16 @@ export function Profile() {
       <section className="rounded-2xl border border-slate-200 p-4">
         <h3 className="mb-3 text-lg font-bold">Settings</h3>
 
-        <p className="mb-2 text-sm font-medium text-slate-600">Text size</p>
-        <div className="mb-5 grid grid-cols-3 gap-2">
+        <p className="mb-1 text-sm font-medium text-slate-600">Text size</p>
+        <p className="mb-2 text-xs text-slate-400">
+          Default is sized for easy reading. Choose Compact for a denser layout.
+        </p>
+        <div className="mb-5 grid grid-cols-2 gap-2">
           {fontOptions.map((o) => (
             <button
               key={o.value}
               onClick={() => setFontScale(o.value)}
+              aria-pressed={settings.fontScale === o.value}
               className={`rounded-xl border py-2.5 text-sm font-semibold ${
                 settings.fontScale === o.value
                   ? 'border-brand-600 bg-brand-50 text-brand-800'

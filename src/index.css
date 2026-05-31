@@ -22,6 +22,7 @@ body {
   margin: 0;
   background: #f8fafc;
   color: #0f172a;
+  line-height: 1.5;
   font-family:
     system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
@@ -33,6 +34,27 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+/* Comfortable, finger-friendly form controls for older volunteers. Sizes use
+   rem so they grow with the chosen text size. Checkboxes/radios/file inputs
+   keep their own footprint. */
+@layer base {
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  select,
+  textarea {
+    min-height: 3rem;
+  }
+
+  button {
+    min-height: 2.75rem;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
 }
 
 /* Respect users who prefer reduced motion */

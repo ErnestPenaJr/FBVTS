@@ -6,7 +6,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   event_manager: 'Event Manager',
 }
 
-export type FontScale = 'normal' | 'large' | 'xlarge'
+export type FontScale = 'compact' | 'normal' | 'large' | 'xlarge'
 
 export interface User {
   id: string

@@ -45,7 +45,7 @@ export function Home() {
             body="Once a Manager adds campus service times, they'll show up here to sign up for."
           />
         ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           {serviceTimes.map((s) => (
             <li key={s.id}>
               <Link
@@ -74,7 +74,7 @@ export function Home() {
           body="Upcoming events created by an Event Manager will appear here."
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           {events.map((e) => (
             <li key={e.id}>
               <Link

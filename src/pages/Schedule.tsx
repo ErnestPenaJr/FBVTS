@@ -37,7 +37,7 @@ export function Schedule() {
   return (
     <div>
       <h2 className="mb-4 text-2xl font-bold">My Schedule</h2>
-      <ul className="space-y-3">
+      <ul className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
         {mine.map((g) => {
           let title = ''
           let subtitle = ''

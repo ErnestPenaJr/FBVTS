@@ -1,14 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Avatar } from './Avatar'
+import { RoleBadge } from './RoleBadge'
 
-const navBase =
-  'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs font-medium transition-colors'
-
-function Icon({ d }: { d: string }) {
+function Icon({ d, className = 'h-6 w-6' }: { d: string; className?: string }) {
   return (
     <svg
-      className="h-6 w-6"
+      className={className}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -30,12 +28,74 @@ const ICONS = {
   profile: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
 }
 
+interface NavItem {
+  to: string
+  label: string
+  icon: string
+  end?: boolean
+}
+
 export function Layout() {
   const { currentUser, isEventManager } = useApp()
 
+  const items: NavItem[] = [
+    { to: '/', label: 'Home', icon: ICONS.home, end: true },
+    { to: '/schedule', label: 'My Schedule', icon: ICONS.schedule },
+    ...(isEventManager
+      ? [{ to: '/manage', label: 'Manage', icon: ICONS.manage }]
+      : []),
+    { to: '/profile', label: 'Profile', icon: ICONS.profile },
+  ]
+
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col bg-white shadow-sm">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-100 bg-brand-700 px-4 py-3 text-white">
+    <div className="min-h-dvh bg-slate-100 md:flex">
+      {/* Desktop sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-slate-200 bg-white md:flex">
+        <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-5 text-brand-700">
+          <Icon d={ICONS.schedule} className="h-7 w-7" />
+          <span className="text-lg font-bold tracking-tight">
+            Volunteer Scheduler
+          </span>
+        </div>
+        <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Primary">
+          {items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+                  isActive
+                    ? 'bg-brand-50 text-brand-700'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`
+              }
+            >
+              <Icon d={item.icon} className="h-5 w-5" />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        {currentUser && (
+          <NavLink
+            to="/profile"
+            className="flex items-center gap-3 border-t border-slate-100 px-4 py-4 hover:bg-slate-50"
+          >
+            <Avatar user={currentUser} size="sm" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold">
+                {currentUser.name}
+              </span>
+              <span className="mt-0.5 block">
+                <RoleBadge role={currentUser.role} />
+              </span>
+            </span>
+          </NavLink>
+        )}
+      </aside>
+
+      {/* Mobile top header */}
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-brand-700 px-4 py-3 text-white md:hidden">
         <div className="flex items-center gap-2">
           <Icon d={ICONS.schedule} />
           <h1 className="text-lg font-bold tracking-tight">Volunteer Scheduler</h1>
@@ -47,44 +107,34 @@ export function Layout() {
         )}
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
-        <Outlet />
-      </main>
+      {/* Main content */}
+      <div className="flex min-h-dvh flex-1 flex-col md:pl-64">
+        <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24 md:px-8 md:pt-8 md:pb-12">
+          <Outlet />
+        </main>
+      </div>
 
+      {/* Mobile bottom nav */}
       <nav
-        className="fixed inset-x-0 bottom-0 mx-auto flex max-w-md border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]"
+        className="fixed inset-x-0 bottom-0 z-20 flex border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
         aria-label="Primary"
       >
-        <Tab to="/" label="Home" icon={ICONS.home} end />
-        <Tab to="/schedule" label="My Schedule" icon={ICONS.schedule} />
-        {isEventManager && <Tab to="/manage" label="Manage" icon={ICONS.manage} />}
-        <Tab to="/profile" label="Profile" icon={ICONS.profile} />
+        {items.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            className={({ isActive }) =>
+              `flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
+                isActive ? 'text-brand-700' : 'text-slate-500 hover:text-slate-700'
+              }`
+            }
+          >
+            <Icon d={item.icon} />
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
       </nav>
     </div>
-  )
-}
-
-function Tab({
-  to,
-  label,
-  icon,
-  end,
-}: {
-  to: string
-  label: string
-  icon: string
-  end?: boolean
-}) {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      className={({ isActive }) =>
-        `${navBase} ${isActive ? 'text-brand-700' : 'text-slate-500 hover:text-slate-700'}`
-      }
-    >
-      <Icon d={icon} />
-      <span>{label}</span>
-    </NavLink>
   )
 }

@@ -16,7 +16,8 @@ export function Login() {
   const go = () => navigate('/', { replace: true })
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center bg-brand-700 px-6 py-10 text-white">
+    <div className="flex min-h-dvh flex-col justify-center bg-brand-700 px-6 py-10 text-white">
+      <div className="mx-auto w-full max-w-md">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-extrabold tracking-tight">
           Volunteer Scheduler
@@ -130,6 +131,7 @@ export function Login() {
             </button>
           </form>
         )}
+      </div>
       </div>
     </div>
   )

@@ -10,7 +10,8 @@
 
 🔗 **Live site:** https://SITE_NAME.netlify.app
 
-A mobile-first volunteer scheduling app. Volunteers register, browse recurring
+A responsive volunteer scheduling app — mobile-first, with a full desktop/web
+layout (left sidebar nav + multi-column lists on larger screens). Volunteers register, browse recurring
 **services** and one-off **events**, and sign up for open **positions**.
 Managers configure campuses and service times; Event Managers create events.
 
@@ -29,7 +30,10 @@ Managers configure campuses and service times; Event Managers create events.
   times; **Event Managers** (and Managers) can create events. This implements
   the "must have a Manager level to add campus and service times" requirement.
 - **Profile** — upload a photo, edit name/phone/bio, and switch role (demo).
-- **Accessibility-minded** — mobile-first layout, finger-friendly tap targets,
+- **Responsive** — a phone layout with a bottom tab bar on small screens, and a
+  desktop layout with a persistent left sidebar and multi-column lists on wider
+  screens. Same app, one codebase.
+- **Accessibility-minded** — finger-friendly tap targets,
   and a comfortable default text size for older volunteers. A **Text size**
   setting (Compact / Default / Large / Largest) lets anyone adjust; because all
   spacing is `rem`-based, the whole UI scales together.

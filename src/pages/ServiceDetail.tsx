@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { PositionList } from '../components/PositionList'
+import { Roster } from '../components/Roster'
 
 export function ServiceDetail() {
   const { id } = useParams()
@@ -25,6 +26,7 @@ export function ServiceDetail() {
 
       <h3 className="mb-3 text-lg font-bold">Positions</h3>
       <PositionList kind="service" refId={service.id} positions={service.positions} />
+      <Roster kind="service" refId={service.id} positions={service.positions} />
     </div>
   )
 }

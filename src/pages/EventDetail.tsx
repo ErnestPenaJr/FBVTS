@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { PositionList } from '../components/PositionList'
+import { Roster } from '../components/Roster'
 
 function formatDate(iso: string) {
   return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, {
@@ -47,6 +48,7 @@ export function EventDetail() {
 
       <h3 className="mb-3 mt-4 text-lg font-bold">Positions</h3>
       <PositionList kind="event" refId={event.id} positions={event.positions} />
+      <Roster kind="event" refId={event.id} positions={event.positions} />
     </div>
   )
 }

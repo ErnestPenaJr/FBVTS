@@ -1,4 +1,4 @@
-import type { AppEvent, Campus, ServiceTime, User } from '../types'
+import type { AppEvent, Campus, ServiceTime, Signup, User } from '../types'
 
 export const seedUsers: User[] = [
   {
@@ -65,6 +65,13 @@ export const seedServiceTimes: ServiceTime[] = [
       { id: 'p2', title: 'Kids Check-in', needed: 4 },
     ],
   },
+]
+
+// A few existing sign-ups so managers see a populated roster out of the box.
+export const seedSignups: Signup[] = [
+  { id: 'g-1', userId: 'u-vol', kind: 'service', refId: 's-dt-sun9', positionId: 'p1' },
+  { id: 'g-2', userId: 'u-manager', kind: 'service', refId: 's-dt-sun9', positionId: 'p3' },
+  { id: 'g-3', userId: 'u-vol', kind: 'event', refId: 'e-foodbank', positionId: 'ep2' },
 ]
 
 export const seedEvents: AppEvent[] = [

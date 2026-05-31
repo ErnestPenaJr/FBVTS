@@ -29,6 +29,9 @@ Managers configure campuses and service times; Event Managers create events.
 - **Manage (role-gated)** — only **Managers** can add campuses and service
   times; **Event Managers** (and Managers) can create events. This implements
   the "must have a Manager level to add campus and service times" requirement.
+- **Manager roster** — on a service/event, managers see *who* signed up for each
+  position (with contact phone) and can remove a volunteer. Hidden from regular
+  volunteers for privacy.
 - **Profile** — upload a photo, edit name/phone/bio, and switch role (demo).
 - **Responsive** — a phone layout with a bottom tab bar on small screens, and a
   desktop layout with a persistent left sidebar and multi-column lists on wider

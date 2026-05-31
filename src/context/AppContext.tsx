@@ -21,6 +21,7 @@ import {
   seedCampuses,
   seedEvents,
   seedServiceTimes,
+  seedSignups,
   seedUsers,
 } from '../data/mockData'
 
@@ -48,7 +49,7 @@ function loadState(): PersistedState {
     campuses: seedCampuses,
     serviceTimes: seedServiceTimes,
     events: seedEvents,
-    signups: [],
+    signups: seedSignups,
     currentUserId: null,
     settings: { fontScale: 'normal' },
   }

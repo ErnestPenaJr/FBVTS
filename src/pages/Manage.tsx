@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
+import { useToast } from '../components/Toast'
 import type { Position } from '../types'
 
 const uid = () => Math.random().toString(36).slice(2, 8)
@@ -126,6 +127,7 @@ function CampusForm({
 }) {
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
+  const toast = useToast()
   return (
     <Card title="Add a campus">
       <form
@@ -134,6 +136,7 @@ function CampusForm({
           e.preventDefault()
           if (!name.trim()) return
           onSubmit({ name: name.trim(), address: address.trim() })
+          toast(`Campus "${name.trim()}" added`)
           setName('')
           setAddress('')
         }}
@@ -180,6 +183,7 @@ function ServiceForm({
   const [positions, setPositions] = useState<Position[]>([
     { id: uid(), title: 'Greeter', needed: 2 },
   ])
+  const toast = useToast()
 
   return (
     <Card title="Add a service time">
@@ -194,6 +198,7 @@ function ServiceForm({
             time: time.trim(),
             positions: positions.filter((p) => p.title.trim()),
           })
+          toast(`${dayOfWeek} ${time.trim()} service added`)
           setTime('')
           setPositions([{ id: uid(), title: 'Greeter', needed: 2 }])
         }}
@@ -260,6 +265,7 @@ function EventForm({
   const [positions, setPositions] = useState<Position[]>([
     { id: uid(), title: 'Volunteer', needed: 4 },
   ])
+  const toast = useToast()
 
   return (
     <Card title="Create an event">
@@ -275,6 +281,7 @@ function EventForm({
             time: time.trim() || 'TBD',
             positions: positions.filter((p) => p.title.trim()),
           })
+          toast(`Event "${name.trim()}" created`)
           setName('')
           setDate('')
           setTime('')

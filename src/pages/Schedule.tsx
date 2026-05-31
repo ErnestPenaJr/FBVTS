@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { useToast } from '../components/Toast'
 
 function formatDate(iso: string) {
   return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, {
@@ -12,6 +13,7 @@ function formatDate(iso: string) {
 export function Schedule() {
   const { signups, currentUser, serviceTimes, events, campusName, cancelSignup } =
     useApp()
+  const toast = useToast()
 
   const mine = signups.filter((g) => g.userId === currentUser?.id)
 
@@ -73,7 +75,10 @@ export function Schedule() {
                 <p className="text-sm text-slate-500">{subtitle}</p>
               </Link>
               <button
-                onClick={() => cancelSignup(g.id)}
+                onClick={() => {
+                  cancelSignup(g.id)
+                  toast('Sign-up cancelled')
+                }}
                 className="shrink-0 rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 active:bg-slate-50"
               >
                 Cancel

@@ -1,4 +1,5 @@
 import { useApp } from '../context/AppContext'
+import { useToast } from './Toast'
 import type { Position } from '../types'
 
 export function PositionList({
@@ -11,6 +12,7 @@ export function PositionList({
   positions: Position[]
 }) {
   const { signups, currentUser, signUp, cancelSignup, positionFilled } = useApp()
+  const toast = useToast()
 
   return (
     <ul className="space-y-3">
@@ -43,14 +45,20 @@ export function PositionList({
             </div>
             {mySignup ? (
               <button
-                onClick={() => cancelSignup(mySignup.id)}
+                onClick={() => {
+                  cancelSignup(mySignup.id)
+                  toast('Sign-up cancelled')
+                }}
                 className="shrink-0 rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 active:bg-slate-50"
               >
                 Cancel
               </button>
             ) : (
               <button
-                onClick={() => signUp(kind, refId, p.id)}
+                onClick={() => {
+                  signUp(kind, refId, p.id)
+                  toast(`You're signed up for ${p.title} 🎉`)
+                }}
                 disabled={isFull}
                 className="shrink-0 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white active:bg-brand-700 disabled:bg-slate-200 disabled:text-slate-400"
               >

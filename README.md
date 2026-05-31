@@ -1,5 +1,15 @@
 # Volunteer Scheduler (FBVTS)
 
+<!--
+  Deploy badge + live link. Replace the two placeholders below with your
+  Netlify values, then this badge turns green/red with each deploy:
+    SITE_API_ID  – Netlify → Site settings → General → "Site ID"
+    SITE_NAME    – your site's subdomain (the part before .netlify.app)
+-->
+[![Netlify Status](https://api.netlify.com/api/v1/badges/SITE_API_ID/deploy-status)](https://app.netlify.com/sites/SITE_NAME/deploys)
+
+🔗 **Live site:** https://SITE_NAME.netlify.app
+
 A mobile-first volunteer scheduling app. Volunteers register, browse recurring
 **services** and one-off **events**, and sign up for open **positions**.
 Managers configure campuses and service times; Event Managers create events.
@@ -19,8 +29,12 @@ Managers configure campuses and service times; Event Managers create events.
   times; **Event Managers** (and Managers) can create events. This implements
   the "must have a Manager level to add campus and service times" requirement.
 - **Profile** — upload a photo, edit name/phone/bio, and switch role (demo).
-- **Accessibility-minded** — mobile-first layout, large tap targets, and a
-  **Text size** setting (Normal / Large / Extra large) for older users.
+- **Accessibility-minded** — mobile-first layout, finger-friendly tap targets,
+  and a comfortable default text size for older volunteers. A **Text size**
+  setting (Compact / Default / Large / Largest) lets anyone adjust; because all
+  spacing is `rem`-based, the whole UI scales together.
+- **Feedback & empty states** — confirmation toasts on sign-up, cancel, profile
+  save, and manager actions; friendly empty states when there's nothing to show.
 
 ## Roles
 

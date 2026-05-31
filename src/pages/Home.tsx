@@ -39,6 +39,12 @@ export function Home() {
       </div>
 
       {tab === 'services' ? (
+        serviceTimes.length === 0 ? (
+          <EmptyState
+            title="No services yet"
+            body="Once a Manager adds campus service times, they'll show up here to sign up for."
+          />
+        ) : (
         <ul className="space-y-3">
           {serviceTimes.map((s) => (
             <li key={s.id}>
@@ -61,6 +67,12 @@ export function Home() {
             </li>
           ))}
         </ul>
+        )
+      ) : events.length === 0 ? (
+        <EmptyState
+          title="No events yet"
+          body="Upcoming events created by an Event Manager will appear here."
+        />
       ) : (
         <ul className="space-y-3">
           {events.map((e) => (
@@ -82,6 +94,15 @@ export function Home() {
           ))}
         </ul>
       )}
+    </div>
+  )
+}
+
+function EmptyState({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center">
+      <h3 className="mb-1 text-lg font-bold text-slate-700">{title}</h3>
+      <p className="text-slate-500">{body}</p>
     </div>
   )
 }

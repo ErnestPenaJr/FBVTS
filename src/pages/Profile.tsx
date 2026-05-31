@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { useToast } from '../components/Toast'
 import { Avatar } from '../components/Avatar'
 import { RoleBadge } from '../components/RoleBadge'
 import { ROLE_LABELS, type FontScale, type Role } from '../types'
@@ -15,6 +16,7 @@ export function Profile() {
     setFontScale,
   } = useApp()
   const navigate = useNavigate()
+  const toast = useToast()
   const fileRef = useRef<HTMLInputElement>(null)
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(currentUser?.name ?? '')
@@ -27,7 +29,10 @@ export function Profile() {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = () => updateProfile({ photoUrl: reader.result as string })
+    reader.onload = () => {
+      updateProfile({ photoUrl: reader.result as string })
+      toast('Photo updated')
+    }
     reader.readAsDataURL(file)
   }
 
@@ -86,6 +91,7 @@ export function Profile() {
             onClick={() => {
               if (editing) {
                 updateProfile({ name: name.trim() || currentUser.name, phone, bio })
+                toast('Profile saved')
               }
               setEditing(!editing)
             }}
@@ -160,7 +166,10 @@ export function Profile() {
           {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
             <button
               key={r}
-              onClick={() => switchRole(r)}
+              onClick={() => {
+                switchRole(r)
+                toast(`Now viewing as ${ROLE_LABELS[r]}`)
+              }}
               className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm font-semibold ${
                 currentUser.role === r
                   ? 'border-brand-600 bg-brand-50 text-brand-800'

@@ -1,0 +1,15 @@
+# Netlify configuration for the Volunteer Scheduler (Vite + React SPA)
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Single-page-app fallback: client-side routes (e.g. /profile, /service/:id)
+# must serve index.html so React Router can handle them on direct load / refresh.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

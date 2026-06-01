@@ -16,6 +16,7 @@ import type {
   Settings,
   Signup,
   User,
+  VolunteerRole,
 } from '../types'
 import {
   seedCampuses,
@@ -23,12 +24,14 @@ import {
   seedServiceTimes,
   seedSignups,
   seedUsers,
+  seedVolunteerRoles,
 } from '../data/mockData'
 
-const STORAGE_KEY = 'fbvts-state-v1'
+const STORAGE_KEY = 'fbvts-state-v2'
 
 interface PersistedState {
   users: User[]
+  volunteerRoles: VolunteerRole[]
   campuses: Campus[]
   serviceTimes: ServiceTime[]
   events: AppEvent[]
@@ -46,6 +49,7 @@ function loadState(): PersistedState {
   }
   return {
     users: seedUsers,
+    volunteerRoles: seedVolunteerRoles,
     campuses: seedCampuses,
     serviceTimes: seedServiceTimes,
     events: seedEvents,
@@ -70,6 +74,25 @@ interface AppContextValue extends PersistedState {
   // profile
   updateProfile: (patch: Partial<User>) => void
   setFontScale: (scale: FontScale) => void
+  // volunteer roles (catalog)
+  addRole: (data: {
+    name: string
+    description?: string
+    defaultNeeded?: number
+    category?: string
+  }) => void
+  updateRole: (
+    id: string,
+    patch: {
+      name: string
+      description?: string
+      defaultNeeded?: number
+      category?: string
+    },
+  ) => void
+  deleteRole: (id: string) => void
+  roleName: (roleId: string) => string
+  roleUsage: (roleId: string) => { services: number; events: number }
   // manager actions
   addCampus: (data: { name: string; address: string }) => void
   addServiceTime: (data: {
@@ -180,6 +203,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
         })),
       setFontScale: (fontScale) =>
         update({ settings: { ...state.settings, fontScale } }),
+
+      addRole: (data) =>
+        setState((s) => ({
+          ...s,
+          volunteerRoles: [...s.volunteerRoles, { id: uid('r'), ...data }],
+        })),
+      updateRole: (id, patch) =>
+        setState((s) => ({
+          ...s,
+          volunteerRoles: s.volunteerRoles.map((r) =>
+            r.id === id ? { ...r, ...patch } : r,
+          ),
+        })),
+      deleteRole: (id) =>
+        setState((s) => {
+          const inUse = [...s.serviceTimes, ...s.events].some((x) =>
+            x.positions.some((p) => p.roleId === id),
+          )
+          if (inUse) return s
+          return {
+            ...s,
+            volunteerRoles: s.volunteerRoles.filter((r) => r.id !== id),
+          }
+        }),
 
       addCampus: ({ name, address }) =>
         setState((s) => ({
@@ -304,6 +351,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       campusName: (campusId) =>
         state.campuses.find((c) => c.id === campusId)?.name ?? 'Unknown campus',
+      roleName: (roleId) =>
+        state.volunteerRoles.find((r) => r.id === roleId)?.name ?? 'Unknown role',
+      roleUsage: (roleId) => ({
+        services: state.serviceTimes.filter((st) =>
+          st.positions.some((p) => p.roleId === roleId),
+        ).length,
+        events: state.events.filter((e) =>
+          e.positions.some((p) => p.roleId === roleId),
+        ).length,
+      }),
       positionFilled: (kind, refId, positionId) =>
         state.signups.filter(
           (g) =>

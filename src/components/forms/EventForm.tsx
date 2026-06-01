@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useToast } from '../Toast'
 import { ConfirmDialog } from '../ConfirmDialog'
-import { PositionsEditor, uid } from './PositionsEditor'
+import { PositionsEditor } from './PositionsEditor'
 import type { AppEvent, Campus, Position, Signup } from '../../types'
 
 type EventData = {
@@ -36,7 +36,7 @@ export function EventForm({
   const [date, setDate] = useState(initial?.date ?? '')
   const [time, setTime] = useState(initial?.time ?? '')
   const [positions, setPositions] = useState<Position[]>(
-    initial?.positions ?? [{ id: uid(), title: 'Volunteer', needed: 4 }],
+    initial?.positions ?? [],
   )
   const [pending, setPending] = useState<EventData | null>(null)
   const toast = useToast()
@@ -48,7 +48,7 @@ export function EventForm({
       setName('')
       setDate('')
       setTime('')
-      setPositions([{ id: uid(), title: 'Volunteer', needed: 4 }])
+      setPositions([])
     }
     onDone?.()
   }
@@ -70,7 +70,7 @@ export function EventForm({
             campusId,
             date,
             time: time.trim() || 'TBD',
-            positions: positions.filter((p) => p.title.trim()),
+            positions: positions.filter((p) => p.roleId),
           }
           if (initial && droppedSignups(data) > 0) {
             setPending(data)

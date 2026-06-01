@@ -11,7 +11,7 @@ function formatDate(iso: string) {
 }
 
 export function Schedule() {
-  const { signups, currentUser, serviceTimes, events, campusName, cancelSignup } =
+  const { signups, currentUser, serviceTimes, events, campusName, cancelSignup, roleName } =
     useApp()
   const toast = useToast()
 
@@ -48,8 +48,8 @@ export function Schedule() {
             if (s) {
               title = `${s.dayOfWeek} ${s.time}`
               subtitle = campusName(s.campusId)
-              positionTitle =
-                s.positions.find((p) => p.id === g.positionId)?.title ?? ''
+              const pos = s.positions.find((p) => p.id === g.positionId)
+              positionTitle = pos ? roleName(pos.roleId) : ''
               to = `/service/${s.id}`
             }
           } else {
@@ -57,8 +57,8 @@ export function Schedule() {
             if (e) {
               title = e.name
               subtitle = `${formatDate(e.date)} · ${e.time}`
-              positionTitle =
-                e.positions.find((p) => p.id === g.positionId)?.title ?? ''
+              const pos = e.positions.find((p) => p.id === g.positionId)
+              positionTitle = pos ? roleName(pos.roleId) : ''
               to = `/event/${e.id}`
             }
           }

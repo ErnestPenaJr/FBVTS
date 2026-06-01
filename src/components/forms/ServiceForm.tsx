@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useToast } from '../Toast'
 import { ConfirmDialog } from '../ConfirmDialog'
-import { PositionsEditor, uid } from './PositionsEditor'
+import { PositionsEditor } from './PositionsEditor'
 import type { Campus, Position, ServiceTime, Signup } from '../../types'
 
 const DAYS = [
@@ -44,7 +44,7 @@ export function ServiceForm({
   const [dayOfWeek, setDay] = useState(initial?.dayOfWeek ?? 'Sunday')
   const [time, setTime] = useState(initial?.time ?? '')
   const [positions, setPositions] = useState<Position[]>(
-    initial?.positions ?? [{ id: uid(), title: 'Greeter', needed: 2 }],
+    initial?.positions ?? [],
   )
   const [pending, setPending] = useState<ServiceData | null>(null)
   const toast = useToast()
@@ -54,7 +54,7 @@ export function ServiceForm({
     toast(initial ? 'Service updated' : `${data.dayOfWeek} ${data.time} service added`)
     if (!initial) {
       setTime('')
-      setPositions([{ id: uid(), title: 'Greeter', needed: 2 }])
+      setPositions([])
     }
     onDone?.()
   }
@@ -75,7 +75,7 @@ export function ServiceForm({
             campusId,
             dayOfWeek,
             time: time.trim(),
-            positions: positions.filter((p) => p.title.trim()),
+            positions: positions.filter((p) => p.roleId),
           }
           if (initial && droppedSignups(data) > 0) {
             setPending(data)

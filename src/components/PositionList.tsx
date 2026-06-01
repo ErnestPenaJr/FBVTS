@@ -11,7 +11,7 @@ export function PositionList({
   refId: string
   positions: Position[]
 }) {
-  const { signups, currentUser, signUp, cancelSignup, positionFilled } = useApp()
+  const { signups, currentUser, signUp, cancelSignup, positionFilled, roleName } = useApp()
   const toast = useToast()
 
   return (
@@ -32,7 +32,7 @@ export function PositionList({
             className="flex items-center gap-3 rounded-2xl border border-slate-200 p-4"
           >
             <div className="flex-1">
-              <h4 className="text-base font-semibold">{p.title}</h4>
+              <h4 className="text-base font-semibold">{roleName(p.roleId)}</h4>
               <p className="text-sm text-slate-500">
                 {filled} of {p.needed} filled
               </p>
@@ -57,7 +57,7 @@ export function PositionList({
               <button
                 onClick={() => {
                   signUp(kind, refId, p.id)
-                  toast(`You're signed up for ${p.title} 🎉`)
+                  toast(`You're signed up for ${roleName(p.roleId)} 🎉`)
                 }}
                 disabled={isFull}
                 className="shrink-0 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white active:bg-brand-700 disabled:bg-slate-200 disabled:text-slate-400"

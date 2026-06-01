@@ -24,10 +24,18 @@ export interface Campus {
   address: string
 }
 
-export interface Position {
+export interface VolunteerRole {
   id: string
-  title: string
-  needed: number
+  name: string
+  description?: string
+  defaultNeeded?: number
+  category?: string
+}
+
+export interface Position {
+  id: string // per-slot id; scopes Signup.positionId — keep stable across edits
+  roleId: string // references VolunteerRole.id
+  needed: number // editable per slot, pre-filled from role.defaultNeeded
 }
 
 /** A recurring weekly service slot at a campus (e.g. "Sunday 9:00 AM"). */

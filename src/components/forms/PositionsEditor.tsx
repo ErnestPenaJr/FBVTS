@@ -1,3 +1,4 @@
+import { useApp } from '../../context/AppContext'
 import type { Position } from '../../types'
 
 /** Short client-side id for new positions added in the editor. */
@@ -10,23 +11,50 @@ export function PositionsEditor({
   positions: Position[]
   setPositions: (p: Position[]) => void
 }) {
+  const { volunteerRoles } = useApp()
+
+  if (volunteerRoles.length === 0) {
+    return (
+      <div className="space-y-2">
+        <span className="block text-sm font-medium text-slate-600">Positions</span>
+        <p className="text-sm text-slate-400">
+          No volunteer roles defined yet. A Manager can add them under Manage →
+          Volunteer roles.
+        </p>
+      </div>
+    )
+  }
+
+  const usedRoleIds = new Set(positions.map((p) => p.roleId))
+  const firstUnused = volunteerRoles.find((r) => !usedRoleIds.has(r.id))
+
   return (
     <div className="space-y-2">
       <span className="block text-sm font-medium text-slate-600">Positions</span>
       {positions.map((p, i) => (
         <div key={p.id} className="flex gap-2">
-          <input
-            value={p.title}
+          <select
+            value={p.roleId}
             onChange={(e) =>
               setPositions(
                 positions.map((x, j) =>
-                  j === i ? { ...x, title: e.target.value } : x,
+                  j === i ? { ...x, roleId: e.target.value } : x,
                 ),
               )
             }
-            placeholder="Role title"
             className="flex-1 rounded-xl border border-slate-300 px-3 py-2.5"
-          />
+            aria-label="Volunteer role"
+          >
+            {volunteerRoles.map((r) => (
+              <option
+                key={r.id}
+                value={r.id}
+                disabled={r.id !== p.roleId && usedRoleIds.has(r.id)}
+              >
+                {r.name}
+              </option>
+            ))}
+          </select>
           <input
             type="number"
             min={1}
@@ -53,8 +81,15 @@ export function PositionsEditor({
       ))}
       <button
         type="button"
-        onClick={() => setPositions([...positions, { id: uid(), title: '', needed: 1 }])}
-        className="text-sm font-semibold text-brand-700"
+        onClick={() => {
+          if (!firstUnused) return
+          setPositions([
+            ...positions,
+            { id: uid(), roleId: firstUnused.id, needed: firstUnused.defaultNeeded ?? 1 },
+          ])
+        }}
+        disabled={!firstUnused}
+        className="text-sm font-semibold text-brand-700 disabled:text-slate-300"
       >
         + Add position
       </button>

@@ -16,7 +16,7 @@ export function Roster({
   refId: string
   positions: Position[]
 }) {
-  const { signups, users, cancelSignup, isEventManager } = useApp()
+  const { signups, users, cancelSignup, isEventManager, roleName } = useApp()
   const toast = useToast()
 
   if (!isEventManager) return null
@@ -29,13 +29,14 @@ export function Roster({
           const signed = signups.filter(
             (g) => g.kind === kind && g.refId === refId && g.positionId === p.id,
           )
+          const title = roleName(p.roleId)
           return (
             <div
               key={p.id}
               className="rounded-2xl border border-slate-200 p-4"
             >
               <div className="mb-3 flex items-center justify-between">
-                <h4 className="font-semibold">{p.title}</h4>
+                <h4 className="font-semibold">{title}</h4>
                 <span
                   className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                     signed.length >= p.needed
@@ -69,10 +70,10 @@ export function Roster({
                         <button
                           onClick={() => {
                             cancelSignup(g.id)
-                            toast(`Removed ${u.name} from ${p.title}`)
+                            toast(`Removed ${u.name} from ${title}`)
                           }}
                           className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 active:bg-slate-50"
-                          aria-label={`Remove ${u.name} from ${p.title}`}
+                          aria-label={`Remove ${u.name} from ${title}`}
                         >
                           Remove
                         </button>

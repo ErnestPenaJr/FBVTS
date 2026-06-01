@@ -1,4 +1,4 @@
-import type { AppEvent, Campus, ServiceTime, Signup, User } from '../types'
+import type { AppEvent, Campus, ServiceTime, Signup, User, VolunteerRole } from '../types'
 
 export const seedUsers: User[] = [
   {
@@ -32,6 +32,19 @@ export const seedCampuses: Campus[] = [
   { id: 'c-north', name: 'North Campus', address: '4500 Oak Ave' },
 ]
 
+export const seedVolunteerRoles: VolunteerRole[] = [
+  { id: 'r-greeter', name: 'Greeter', category: 'Hospitality', defaultNeeded: 4, description: 'Welcome people at the doors.' },
+  { id: 'r-kids', name: 'Kids Check-in', category: 'Kids', defaultNeeded: 3, description: 'Check children in and out safely.' },
+  { id: 'r-parking', name: 'Parking', category: 'Hospitality', defaultNeeded: 2, description: 'Direct traffic and help people park.' },
+  { id: 'r-worship', name: 'Worship Team', category: 'Worship', defaultNeeded: 2, description: 'Lead music during the service.' },
+  { id: 'r-coffee', name: 'Coffee Bar', category: 'Hospitality', defaultNeeded: 3, description: 'Serve coffee and refreshments.' },
+  { id: 'r-setup', name: 'Setup Crew', category: 'Production', defaultNeeded: 6, description: 'Set up tables, chairs, and equipment.' },
+  { id: 'r-food', name: 'Food Distribution', category: 'Outreach', defaultNeeded: 10, description: 'Hand out food to guests.' },
+  { id: 'r-cleanup', name: 'Cleanup', category: 'Production', defaultNeeded: 4, description: 'Tear down and clean up afterward.' },
+  { id: 'r-registration', name: 'Registration', category: 'Outreach', defaultNeeded: 4, description: 'Register attendees at the table.' },
+  { id: 'r-supply', name: 'Supply Handout', category: 'Outreach', defaultNeeded: 8, description: 'Distribute supplies to families.' },
+]
+
 export const seedServiceTimes: ServiceTime[] = [
   {
     id: 's-dt-sun9',
@@ -39,9 +52,9 @@ export const seedServiceTimes: ServiceTime[] = [
     dayOfWeek: 'Sunday',
     time: '9:00 AM',
     positions: [
-      { id: 'p1', title: 'Greeter', needed: 4 },
-      { id: 'p2', title: 'Kids Check-in', needed: 3 },
-      { id: 'p3', title: 'Parking', needed: 2 },
+      { id: 'p1', roleId: 'r-greeter', needed: 4 },
+      { id: 'p2', roleId: 'r-kids', needed: 3 },
+      { id: 'p3', roleId: 'r-parking', needed: 2 },
     ],
   },
   {
@@ -50,9 +63,9 @@ export const seedServiceTimes: ServiceTime[] = [
     dayOfWeek: 'Sunday',
     time: '11:00 AM',
     positions: [
-      { id: 'p1', title: 'Greeter', needed: 4 },
-      { id: 'p4', title: 'Worship Team', needed: 2 },
-      { id: 'p5', title: 'Coffee Bar', needed: 3 },
+      { id: 'p1', roleId: 'r-greeter', needed: 4 },
+      { id: 'p4', roleId: 'r-worship', needed: 2 },
+      { id: 'p5', roleId: 'r-coffee', needed: 3 },
     ],
   },
   {
@@ -61,8 +74,8 @@ export const seedServiceTimes: ServiceTime[] = [
     dayOfWeek: 'Sunday',
     time: '10:00 AM',
     positions: [
-      { id: 'p1', title: 'Greeter', needed: 3 },
-      { id: 'p2', title: 'Kids Check-in', needed: 4 },
+      { id: 'p1', roleId: 'r-greeter', needed: 3 },
+      { id: 'p2', roleId: 'r-kids', needed: 4 },
     ],
   },
 ]
@@ -83,9 +96,9 @@ export const seedEvents: AppEvent[] = [
     date: '2026-06-13',
     time: '8:00 AM',
     positions: [
-      { id: 'ep1', title: 'Setup Crew', needed: 6 },
-      { id: 'ep2', title: 'Food Distribution', needed: 10 },
-      { id: 'ep3', title: 'Cleanup', needed: 4 },
+      { id: 'ep1', roleId: 'r-setup', needed: 6 },
+      { id: 'ep2', roleId: 'r-food', needed: 10 },
+      { id: 'ep3', roleId: 'r-cleanup', needed: 4 },
     ],
   },
   {
@@ -96,8 +109,8 @@ export const seedEvents: AppEvent[] = [
     date: '2026-08-15',
     time: '10:00 AM',
     positions: [
-      { id: 'ep4', title: 'Registration', needed: 4 },
-      { id: 'ep5', title: 'Supply Handout', needed: 8 },
+      { id: 'ep4', roleId: 'r-registration', needed: 4 },
+      { id: 'ep5', roleId: 'r-supply', needed: 8 },
     ],
   },
 ]

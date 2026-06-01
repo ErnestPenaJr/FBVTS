@@ -233,7 +233,7 @@ export function CalendarMonth() {
                   <Link
                     key={o.key}
                     to={o.to}
-                    className={`block truncate rounded-md px-1.5 py-1 text-xs font-semibold ${
+                    className={`block truncate rounded-md px-1.5 py-1 ${
                       o.kind === 'service'
                         ? o.isMine
                           ? 'bg-brand-600 text-white'
@@ -243,26 +243,30 @@ export function CalendarMonth() {
                           : 'bg-fuchsia-100 text-fuchsia-800'
                     }`}
                   >
-                    {o.isMine ? '✓ ' : ''}
-                    {o.title}
+                    {/* Size lives on a child span: the global `a { font: inherit }`
+                        reset in index.css overrides text-* utilities set on the anchor. */}
+                    <span className="text-xs font-semibold">
+                      {o.isMine ? '✓ ' : ''}
+                      {o.title}
+                    </span>
                   </Link>
                 ))}
                 {hidden > 0 && (
                   <button
                     type="button"
                     onClick={() => toggleDay(k)}
-                    className="block w-full rounded-md px-1.5 py-1 text-left text-xs font-semibold text-slate-500 hover:bg-slate-100"
+                    className="block w-full rounded-md px-1.5 py-1 text-left text-slate-500 hover:bg-slate-100"
                   >
-                    +{hidden} more
+                    <span className="text-xs font-semibold">+{hidden} more</span>
                   </button>
                 )}
                 {isExpanded && occs.length > MAX_PILLS && (
                   <button
                     type="button"
                     onClick={() => toggleDay(k)}
-                    className="block w-full rounded-md px-1.5 py-1 text-left text-xs font-semibold text-slate-500 hover:bg-slate-100"
+                    className="block w-full rounded-md px-1.5 py-1 text-left text-slate-500 hover:bg-slate-100"
                   >
-                    Show less
+                    <span className="text-xs font-semibold">Show less</span>
                   </button>
                 )}
               </div>

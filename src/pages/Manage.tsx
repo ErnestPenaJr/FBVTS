@@ -4,11 +4,12 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { ManageRail } from '../components/manage/ManageRail'
 import { CampusSection } from '../components/manage/CampusSection'
 import { ServiceSection } from '../components/manage/ServiceSection'
+import { RoleSection } from '../components/manage/RoleSection'
 import { EventSection } from '../components/manage/EventSection'
 import type { RailItem, SectionKey } from '../components/manage/types'
 
 export function Manage() {
-  const { isManager, isEventManager, campuses, serviceTimes, events } = useApp()
+  const { isManager, isEventManager, campuses, volunteerRoles, serviceTimes, events } = useApp()
   const [active, setActive] = useState<SectionKey>(isManager ? 'campuses' : 'events')
   const [confirm, setConfirm] = useState<{
     title: string
@@ -27,6 +28,7 @@ export function Manage() {
   const sections: RailItem[] = isManager
     ? [
         { key: 'campuses', label: 'Campuses', count: campuses.length },
+        { key: 'roles', label: 'Volunteer roles', count: volunteerRoles.length },
         { key: 'services', label: 'Service times', count: serviceTimes.length },
         { key: 'events', label: 'Events', count: events.length },
       ]
@@ -56,6 +58,11 @@ export function Manage() {
           {isManager && (
             <div className={vis('campuses')}>
               <CampusSection requestConfirm={requestConfirm} />
+            </div>
+          )}
+          {isManager && (
+            <div className={vis('roles')}>
+              <RoleSection requestConfirm={requestConfirm} />
             </div>
           )}
           {isManager && (

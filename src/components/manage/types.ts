@@ -1,4 +1,4 @@
-export type SectionKey = 'campuses' | 'services' | 'events'
+export type SectionKey = 'campuses' | 'roles' | 'services' | 'events'
 
 export interface RailItem {
   key: SectionKey

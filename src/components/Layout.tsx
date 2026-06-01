@@ -111,9 +111,11 @@ export function Layout() {
       {/* Main content */}
       <div className="flex min-h-dvh flex-1 flex-col md:pl-64">
         <main
-          className={`mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24 md:px-8 md:pt-8 md:pb-12 ${
-            pathname === '/manage' ? 'md:max-w-6xl' : ''
-          }`}
+          className={
+            pathname === '/manage'
+              ? 'mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24 md:max-w-6xl md:px-8 md:pt-8 md:pb-12'
+              : 'mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24 md:px-8 md:pt-8 md:pb-12'
+          }
         >
           <Outlet />
         </main>

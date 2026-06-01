@@ -32,6 +32,8 @@ export function Manage() {
       ]
     : [{ key: 'events', label: 'Events', count: events.length }]
 
+  const safeActive = sections.some((s) => s.key === active) ? active : sections[0].key
+
   const requestConfirm = (opts: {
     title: string
     message?: string
@@ -41,14 +43,14 @@ export function Manage() {
   // Mobile: every section is `block` (full stacked layout, rail hidden).
   // Desktop: only the active section is shown.
   const vis = (key: SectionKey) =>
-    `block ${active === key ? 'md:block' : 'md:hidden'}`
+    `block ${safeActive === key ? 'md:block' : 'md:hidden'}`
 
   return (
     <div>
       <h2 className="mb-4 text-2xl font-bold">Manage</h2>
 
       <div className="md:flex md:gap-6">
-        <ManageRail items={sections} active={active} onSelect={setActive} />
+        <ManageRail items={sections} active={safeActive} onSelect={setActive} />
 
         <div className="mt-4 space-y-6 md:mt-0 md:min-w-0 md:flex-1 md:space-y-0">
           {isManager && (

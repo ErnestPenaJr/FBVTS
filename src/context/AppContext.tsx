@@ -85,6 +85,29 @@ interface AppContextValue extends PersistedState {
     time: string
     positions: Position[]
   }) => void
+  updateCampus: (id: string, patch: { name: string; address: string }) => void
+  deleteCampus: (id: string) => void
+  updateServiceTime: (
+    id: string,
+    patch: {
+      campusId: string
+      dayOfWeek: string
+      time: string
+      positions: Position[]
+    },
+  ) => void
+  deleteServiceTime: (id: string) => void
+  updateEvent: (
+    id: string,
+    patch: {
+      name: string
+      campusId: string
+      date: string
+      time: string
+      positions: Position[]
+    },
+  ) => void
+  deleteEvent: (id: string) => void
   // signups
   signUp: (kind: 'service' | 'event', refId: string, positionId: string) => void
   cancelSignup: (signupId: string) => void
@@ -175,6 +198,76 @@ export function AppProvider({ children }: { children: ReactNode }) {
             ...s.events,
             { id: uid('e'), managerId: s.currentUserId ?? '', ...data },
           ],
+        })),
+
+      updateCampus: (id, patch) =>
+        setState((s) => ({
+          ...s,
+          campuses: s.campuses.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+        })),
+      deleteCampus: (id) =>
+        setState((s) => {
+          const removedServiceIds = s.serviceTimes
+            .filter((st) => st.campusId === id)
+            .map((st) => st.id)
+          const removedEventIds = s.events
+            .filter((e) => e.campusId === id)
+            .map((e) => e.id)
+          return {
+            ...s,
+            campuses: s.campuses.filter((c) => c.id !== id),
+            serviceTimes: s.serviceTimes.filter((st) => st.campusId !== id),
+            events: s.events.filter((e) => e.campusId !== id),
+            signups: s.signups.filter((g) =>
+              g.kind === 'service'
+                ? !removedServiceIds.includes(g.refId)
+                : !removedEventIds.includes(g.refId),
+            ),
+          }
+        }),
+      updateServiceTime: (id, patch) =>
+        setState((s) => {
+          const validPositionIds = patch.positions.map((p) => p.id)
+          return {
+            ...s,
+            serviceTimes: s.serviceTimes.map((st) =>
+              st.id === id ? { ...st, ...patch } : st,
+            ),
+            signups: s.signups.filter((g) =>
+              g.kind === 'service' && g.refId === id
+                ? validPositionIds.includes(g.positionId)
+                : true,
+            ),
+          }
+        }),
+      deleteServiceTime: (id) =>
+        setState((s) => ({
+          ...s,
+          serviceTimes: s.serviceTimes.filter((st) => st.id !== id),
+          signups: s.signups.filter(
+            (g) => !(g.kind === 'service' && g.refId === id),
+          ),
+        })),
+      updateEvent: (id, patch) =>
+        setState((s) => {
+          const validPositionIds = patch.positions.map((p) => p.id)
+          return {
+            ...s,
+            events: s.events.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+            signups: s.signups.filter((g) =>
+              g.kind === 'event' && g.refId === id
+                ? validPositionIds.includes(g.positionId)
+                : true,
+            ),
+          }
+        }),
+      deleteEvent: (id) =>
+        setState((s) => ({
+          ...s,
+          events: s.events.filter((e) => e.id !== id),
+          signups: s.signups.filter(
+            (g) => !(g.kind === 'event' && g.refId === id),
+          ),
         })),
 
       signUp: (kind, refId, positionId) => {

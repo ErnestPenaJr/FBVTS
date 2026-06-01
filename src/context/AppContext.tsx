@@ -207,22 +207,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
         })),
       deleteCampus: (id) =>
         setState((s) => {
-          const removedServiceIds = s.serviceTimes
-            .filter((st) => st.campusId === id)
-            .map((st) => st.id)
-          const removedEventIds = s.events
-            .filter((e) => e.campusId === id)
-            .map((e) => e.id)
+          const removedServiceIds = new Set(
+            s.serviceTimes.filter((st) => st.campusId === id).map((st) => st.id),
+          )
+          const removedEventIds = new Set(
+            s.events.filter((e) => e.campusId === id).map((e) => e.id),
+          )
           return {
             ...s,
             campuses: s.campuses.filter((c) => c.id !== id),
             serviceTimes: s.serviceTimes.filter((st) => st.campusId !== id),
             events: s.events.filter((e) => e.campusId !== id),
-            signups: s.signups.filter((g) =>
-              g.kind === 'service'
-                ? !removedServiceIds.includes(g.refId)
-                : !removedEventIds.includes(g.refId),
-            ),
+            signups: s.signups.filter((g) => {
+              if (g.kind === 'service') return !removedServiceIds.has(g.refId)
+              if (g.kind === 'event') return !removedEventIds.has(g.refId)
+              return true
+            }),
           }
         }),
       updateServiceTime: (id, patch) =>

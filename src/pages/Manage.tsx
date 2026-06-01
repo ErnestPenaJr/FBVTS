@@ -1,32 +1,15 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { useToast } from '../components/Toast'
 import { ConfirmDialog } from '../components/ConfirmDialog'
-import { CampusForm } from '../components/forms/CampusForm'
-import { ServiceForm } from '../components/forms/ServiceForm'
-import { EventForm } from '../components/forms/EventForm'
+import { ManageRail } from '../components/manage/ManageRail'
+import { CampusSection } from '../components/manage/CampusSection'
+import { ServiceSection } from '../components/manage/ServiceSection'
+import { EventSection } from '../components/manage/EventSection'
+import type { RailItem, SectionKey } from '../components/manage/types'
 
 export function Manage() {
-  const {
-    isManager,
-    isEventManager,
-    campuses,
-    serviceTimes,
-    events,
-    signups,
-    addCampus,
-    addServiceTime,
-    addEvent,
-    updateCampus,
-    deleteCampus,
-    deleteServiceTime,
-    deleteEvent,
-    campusName,
-  } = useApp()
-  const toast = useToast()
-
-  const [editingCampusId, setEditingCampusId] = useState<string | null>(null)
+  const { isManager, isEventManager, campuses, serviceTimes, events } = useApp()
+  const [active, setActive] = useState<SectionKey>(isManager ? 'campuses' : 'events')
   const [confirm, setConfirm] = useState<{
     title: string
     message?: string
@@ -41,225 +24,48 @@ export function Manage() {
     )
   }
 
-  const serviceSignupCount = (serviceId: string) =>
-    signups.filter((g) => g.kind === 'service' && g.refId === serviceId).length
-  const eventSignupCount = (eventId: string) =>
-    signups.filter((g) => g.kind === 'event' && g.refId === eventId).length
+  const sections: RailItem[] = isManager
+    ? [
+        { key: 'campuses', label: 'Campuses', count: campuses.length },
+        { key: 'services', label: 'Service times', count: serviceTimes.length },
+        { key: 'events', label: 'Events', count: events.length },
+      ]
+    : [{ key: 'events', label: 'Events', count: events.length }]
+
+  const requestConfirm = (opts: {
+    title: string
+    message?: string
+    onConfirm: () => void
+  }) => setConfirm(opts)
+
+  // Mobile: every section is `block` (full stacked layout, rail hidden).
+  // Desktop: only the active section is shown.
+  const vis = (key: SectionKey) =>
+    `block ${active === key ? 'md:block' : 'md:hidden'}`
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Manage</h2>
+    <div>
+      <h2 className="mb-4 text-2xl font-bold">Manage</h2>
 
-      {isManager && (
-        <>
-          <Card title="Add a campus">
-            <CampusForm onSubmit={addCampus} />
-          </Card>
+      <div className="md:flex md:gap-6">
+        <ManageRail items={sections} active={active} onSelect={setActive} />
 
-          <Card title="Add a service time">
-            <ServiceForm campuses={campuses} onSubmit={addServiceTime} />
-            <p className="mt-3 text-center text-xs text-slate-400">
-              {serviceTimes.length} service times configured
-            </p>
-          </Card>
-        </>
-      )}
-
-      <Card title="Create an event">
-        <EventForm campuses={campuses} onSubmit={addEvent} />
-        <p className="mt-3 text-center text-xs text-slate-400">
-          {events.length} events scheduled
-        </p>
-      </Card>
-
-      {isManager && (
-        <Card title="Existing campuses">
-          {campuses.length === 0 ? (
-            <p className="text-sm text-slate-400">No campuses yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {campuses.map((c) => {
-                const deps =
-                  serviceTimes.filter((s) => s.campusId === c.id).length
-                const evs = events.filter((e) => e.campusId === c.id).length
-                return (
-                  <li
-                    key={c.id}
-                    className="rounded-2xl border border-slate-200 p-3"
-                  >
-                    {editingCampusId === c.id ? (
-                      <CampusForm
-                        initial={c}
-                        submitLabel="Save changes"
-                        onSubmit={(d) => updateCampus(c.id, d)}
-                        onDone={() => setEditingCampusId(null)}
-                        onCancel={() => setEditingCampusId(null)}
-                      />
-                    ) : (
-                      <div className="flex items-center gap-3">
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold">{c.name}</p>
-                          <p className="truncate text-sm text-slate-400">
-                            {c.address}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          aria-label={`Edit campus ${c.name}`}
-                          onClick={() => setEditingCampusId(c.id)}
-                          className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 active:bg-slate-50"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          aria-label={`Delete campus ${c.name}`}
-                          onClick={() =>
-                            setConfirm({
-                              title: `Delete ${c.name}?`,
-                              message:
-                                deps > 0 || evs > 0
-                                  ? `This campus has ${[
-                                      deps > 0 ? `${deps} service time${deps === 1 ? '' : 's'}` : null,
-                                      evs > 0 ? `${evs} event${evs === 1 ? '' : 's'}` : null,
-                                    ]
-                                      .filter(Boolean)
-                                      .join(' and ')}. All of them and their sign-ups will be removed.`
-                                  : undefined,
-                              onConfirm: () => {
-                                deleteCampus(c.id)
-                                toast('Campus deleted')
-                              },
-                            })
-                          }
-                          className="shrink-0 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 active:bg-red-50"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
+        <div className="mt-4 space-y-6 md:mt-0 md:min-w-0 md:flex-1 md:space-y-0">
+          {isManager && (
+            <div className={vis('campuses')}>
+              <CampusSection requestConfirm={requestConfirm} />
+            </div>
           )}
-        </Card>
-      )}
-
-      {isManager && (
-        <Card title="Existing service times">
-          {serviceTimes.length === 0 ? (
-            <p className="text-sm text-slate-400">No service times yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {serviceTimes.map((s) => {
-                const count = serviceSignupCount(s.id)
-                return (
-                  <li
-                    key={s.id}
-                    className="flex items-center gap-3 rounded-2xl border border-slate-200 p-3"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold">
-                        {s.dayOfWeek} {s.time}
-                      </p>
-                      <p className="truncate text-sm text-slate-400">
-                        {campusName(s.campusId)}
-                      </p>
-                    </div>
-                    <Link
-                      to={`/service/${s.id}`}
-                      aria-label={`Edit ${s.dayOfWeek} ${s.time}`}
-                      className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 active:bg-slate-50"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      type="button"
-                      aria-label={`Delete ${s.dayOfWeek} ${s.time} service time`}
-                      onClick={() =>
-                        setConfirm({
-                          title: 'Delete this service time?',
-                          message:
-                            count > 0
-                              ? `${count} volunteer(s) are signed up. Deleting removes their sign-ups too.`
-                              : undefined,
-                          onConfirm: () => {
-                            deleteServiceTime(s.id)
-                            toast('Service time deleted')
-                          },
-                        })
-                      }
-                      className="shrink-0 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 active:bg-red-50"
-                    >
-                      Delete
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+          {isManager && (
+            <div className={vis('services')}>
+              <ServiceSection requestConfirm={requestConfirm} />
+            </div>
           )}
-        </Card>
-      )}
-
-      <Card title="Existing events">
-        {events.length === 0 ? (
-          <p className="text-sm text-slate-400">No events yet.</p>
-        ) : (
-          <ul className="space-y-3">
-            {events.map((e) => {
-              const count = eventSignupCount(e.id)
-              return (
-                <li
-                  key={e.id}
-                  className="flex items-center gap-3 rounded-2xl border border-slate-200 p-3"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{e.name}</p>
-                    <p className="truncate text-sm text-slate-400">
-                      {e.date} · {campusName(e.campusId)}
-                    </p>
-                  </div>
-                  <Link
-                    to={`/event/${e.id}`}
-                    aria-label={`Edit ${e.name}`}
-                    className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 active:bg-slate-50"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    type="button"
-                    aria-label={`Delete ${e.name}`}
-                    onClick={() =>
-                      setConfirm({
-                        title: `Delete ${e.name}?`,
-                        message:
-                          count > 0
-                            ? `${count} volunteer(s) are signed up. Deleting removes their sign-ups too.`
-                            : undefined,
-                        onConfirm: () => {
-                          deleteEvent(e.id)
-                          toast('Event deleted')
-                        },
-                      })
-                    }
-                    className="shrink-0 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-600 active:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </Card>
-
-      {!isManager && (
-        <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-          Note: only <strong>Managers</strong> can add campuses and service times.
-          As an Event Manager you can create events.
-        </p>
-      )}
+          <div className={vis('events')}>
+            <EventSection requestConfirm={requestConfirm} />
+          </div>
+        </div>
+      </div>
 
       <ConfirmDialog
         open={confirm !== null}
@@ -272,20 +78,5 @@ export function Manage() {
         onCancel={() => setConfirm(null)}
       />
     </div>
-  )
-}
-
-export function Card({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <section className="rounded-2xl border border-slate-200 p-4">
-      <h3 className="mb-3 text-lg font-bold">{title}</h3>
-      {children}
-    </section>
   )
 }

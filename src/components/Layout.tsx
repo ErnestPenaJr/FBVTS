@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Avatar } from './Avatar'
 import { RoleBadge } from './RoleBadge'
@@ -37,6 +37,7 @@ interface NavItem {
 
 export function Layout() {
   const { currentUser, isEventManager } = useApp()
+  const { pathname } = useLocation()
 
   const items: NavItem[] = [
     { to: '/', label: 'Home', icon: ICONS.home, end: true },
@@ -109,7 +110,11 @@ export function Layout() {
 
       {/* Main content */}
       <div className="flex min-h-dvh flex-1 flex-col md:pl-64">
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24 md:px-8 md:pt-8 md:pb-12">
+        <main
+          className={`mx-auto w-full max-w-3xl flex-1 px-4 pt-4 pb-24 md:px-8 md:pt-8 md:pb-12 ${
+            pathname === '/manage' ? 'md:max-w-6xl' : ''
+          }`}
+        >
           <Outlet />
         </main>
       </div>

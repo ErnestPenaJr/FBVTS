@@ -51,7 +51,7 @@ export function ServiceForm({
 
   const commit = (data: ServiceData) => {
     onSubmit(data)
-    toast(initial ? 'Service updated' : `${dayOfWeek} ${data.time} service added`)
+    toast(initial ? 'Service updated' : `${data.dayOfWeek} ${data.time} service added`)
     if (!initial) {
       setTime('')
       setPositions([{ id: uid(), title: 'Greeter', needed: 2 }])
@@ -138,6 +138,7 @@ export function ServiceForm({
             : undefined
         }
         confirmLabel="Save"
+        destructive={false}
         onConfirm={() => {
           if (pending) commit(pending)
           setPending(null)

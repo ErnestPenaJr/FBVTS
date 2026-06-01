@@ -136,6 +136,7 @@ export function EventForm({
             : undefined
         }
         confirmLabel="Save"
+        destructive={false}
         onConfirm={() => {
           if (pending) commit(pending)
           setPending(null)

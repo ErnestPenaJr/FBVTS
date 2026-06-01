@@ -37,8 +37,8 @@ export function ServiceDetail() {
       </Link>
 
       {editing ? (
-        <section className="mt-3 rounded-2xl border border-slate-200 p-4">
-          <h3 className="mb-3 text-lg font-bold">Edit service time</h3>
+        <section className="mt-3 rounded-2xl border border-slate-200 p-4" aria-labelledby="edit-service-title">
+          <h3 id="edit-service-title" className="mb-3 text-lg font-bold">Edit service time</h3>
           <ServiceForm
             campuses={campuses}
             initial={service}
@@ -60,12 +60,14 @@ export function ServiceDetail() {
           {isManager && (
             <div className="mb-5 flex gap-3">
               <button
+                type="button"
                 onClick={() => setEditing(true)}
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 active:bg-slate-50"
               >
                 Edit
               </button>
               <button
+                type="button"
                 onClick={() => setConfirmDelete(true)}
                 className="rounded-xl border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 active:bg-red-50"
               >

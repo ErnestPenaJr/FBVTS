@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { CalendarMonth } from '../components/CalendarMonth'
 
 function formatDate(iso: string) {
   return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, {
@@ -19,6 +20,11 @@ export function Home() {
       <p className="text-slate-500">Welcome back,</p>
       <h2 className="mb-4 text-2xl font-bold">{currentUser?.name} 👋</h2>
 
+      <div className="hidden md:block">
+        <CalendarMonth />
+      </div>
+
+      <div className="md:hidden">
       <div
         className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1"
         role="tablist"
@@ -94,6 +100,7 @@ export function Home() {
           ))}
         </ul>
       )}
+      </div>
     </div>
   )
 }

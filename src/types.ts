@@ -6,6 +6,11 @@ export const ROLE_LABELS: Record<Role, string> = {
   event_manager: 'Event Manager',
 }
 
+/** The single reserved developer / super-admin account. Super-admin power is
+ *  derived from this email, not from a role, so it can never be self-assigned
+ *  through the role switcher. */
+export const SUPER_ADMIN_EMAIL = 'epena@fallbrookchurch.com'
+
 export type FontScale = 'compact' | 'normal' | 'large' | 'xlarge'
 
 export interface User {

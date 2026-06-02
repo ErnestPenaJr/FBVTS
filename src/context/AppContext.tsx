@@ -77,7 +77,13 @@ interface AppContextValue extends PersistedState {
   updateProfile: (patch: Partial<User>) => void
   setFontScale: (scale: FontScale) => void
   // super-admin user management
-  adminCreateUser: (data: { name: string; email: string; role: Role }) => void
+  adminCreateUser: (data: {
+    name: string
+    email: string
+    phone?: string
+    bio?: string
+    role: Role
+  }) => void
   adminUpdateUser: (
     id: string,
     patch: Partial<Pick<User, 'name' | 'email' | 'phone' | 'bio' | 'role'>>,
@@ -219,7 +225,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setFontScale: (fontScale) =>
         update({ settings: { ...state.settings, fontScale } }),
 
-      adminCreateUser: ({ name, email, role }) =>
+      adminCreateUser: ({ name, email, phone, bio, role }) =>
         setState((s) => {
           const me = s.users.find((u) => u.id === s.currentUserId)
           if (me?.email !== SUPER_ADMIN_EMAIL) return s
@@ -235,6 +241,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             id: uid('u'),
             name: trimmedName,
             email: trimmedEmail,
+            phone: phone?.trim() || undefined,
+            bio: bio?.trim() || undefined,
             role,
           }
           return { ...s, users: [...s.users, user] }

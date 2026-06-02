@@ -58,6 +58,15 @@ export function Admin() {
           <div className="mb-3 rounded-xl border border-brand-200 bg-brand-50/50 p-3">
             <UserForm
               onSubmit={(d) => {
+                const lower = d.email.toLowerCase()
+                if (lower === SUPER_ADMIN_EMAIL.toLowerCase()) {
+                  toast('That email is reserved')
+                  return
+                }
+                if (users.some((x) => x.email.toLowerCase() === lower)) {
+                  toast('That email is already in use')
+                  return
+                }
                 adminCreateUser(d)
                 toast(`User "${d.name}" added`)
               }}
@@ -75,10 +84,26 @@ export function Admin() {
               <li key={u.id} className="rounded-2xl border border-slate-200 p-3">
                 {editingId === u.id ? (
                   <UserForm
+                    key={u.id}
                     initial={u}
                     lockEmail={isSuperAcct}
                     submitLabel="Save changes"
                     onSubmit={(d) => {
+                      const lower = d.email.toLowerCase()
+                      if (!isSuperAcct) {
+                        if (lower === SUPER_ADMIN_EMAIL.toLowerCase()) {
+                          toast('That email is reserved')
+                          return
+                        }
+                        if (
+                          users.some(
+                            (x) => x.id !== u.id && x.email.toLowerCase() === lower,
+                          )
+                        ) {
+                          toast('That email is already in use')
+                          return
+                        }
+                      }
                       adminUpdateUser(u.id, d)
                       toast('User updated')
                     }}

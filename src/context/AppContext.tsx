@@ -190,6 +190,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       isSuperAdmin: superAdmin,
 
       register: ({ name, email, role }) => {
+        // the reserved super-admin email can't be claimed via self-registration
+        if (email.trim().toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) return
         const user: User = { id: uid('u'), name, email, role }
         setState((s) => ({
           ...s,
@@ -245,6 +247,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const target = s.users.find((u) => u.id === id)
           if (!target) return s
           const next: Partial<User> = { ...patch }
+          if (next.name !== undefined) {
+            const name = next.name.trim()
+            if (!name) return s
+            next.name = name
+          }
           // the super-admin account's own email is locked
           if (target.email === SUPER_ADMIN_EMAIL) delete next.email
           if (next.email !== undefined) {
@@ -282,6 +289,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             users: s.users.filter((u) => u.id !== id),
             // cascade: remove the deleted user's signups (no orphans)
             signups: s.signups.filter((g) => g.userId !== id),
+            // events created by this user intentionally keep their managerId
+            // (it is a display-only label; events are not cascade-deleted)
           }
         }),
 

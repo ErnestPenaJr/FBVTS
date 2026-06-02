@@ -26,6 +26,7 @@ const ICONS = {
     'M8 2v4M16 2v4M3 9h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z',
   manage: 'M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4Z',
   profile: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0',
+  users: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
 }
 
 interface NavItem {
@@ -36,7 +37,7 @@ interface NavItem {
 }
 
 export function Layout() {
-  const { currentUser, isEventManager } = useApp()
+  const { currentUser, isEventManager, isSuperAdmin } = useApp()
   const { pathname } = useLocation()
 
   const items: NavItem[] = [
@@ -44,6 +45,9 @@ export function Layout() {
     { to: '/schedule', label: 'My Schedule', icon: ICONS.schedule },
     ...(isEventManager
       ? [{ to: '/manage', label: 'Manage', icon: ICONS.manage }]
+      : []),
+    ...(isSuperAdmin
+      ? [{ to: '/admin', label: 'Users', icon: ICONS.users }]
       : []),
     { to: '/profile', label: 'Profile', icon: ICONS.profile },
   ]

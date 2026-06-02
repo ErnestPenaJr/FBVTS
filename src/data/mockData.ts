@@ -1,6 +1,15 @@
 import type { AppEvent, Campus, ServiceTime, Signup, User, VolunteerRole } from '../types'
+import { SUPER_ADMIN_EMAIL } from '../types'
 
 export const seedUsers: User[] = [
+  {
+    id: 'u-superadmin',
+    name: 'Ernest Peña',
+    email: SUPER_ADMIN_EMAIL,
+    phone: '555-0100',
+    role: 'manager',
+    bio: 'Developer / super admin.',
+  },
   {
     id: 'u-manager',
     name: 'Pat Rivera',

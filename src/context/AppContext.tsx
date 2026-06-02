@@ -27,7 +27,7 @@ import {
   seedVolunteerRoles,
 } from '../data/mockData'
 
-const STORAGE_KEY = 'fbvts-state-v2'
+const STORAGE_KEY = 'fbvts-state-v3'
 
 interface PersistedState {
   users: User[]

@@ -6,7 +6,7 @@
 ## Goal
 
 Introduce a privileged "super admin" (developer) account —
-`epena@fallbrookchurch.com` — that can manage all other user accounts: list,
+`epena@fallbrookchurch.org` — that can manage all other user accounts: list,
 create, edit, change roles, and delete. This is the first account in the app
 with authority *over other users*, as opposed to authority over scheduling data
 (campuses, service times, events).
@@ -18,7 +18,7 @@ role. This makes it "the developer account" that cannot be self-assigned through
 the existing self-service role switcher.
 
 - Add a constant in `src/types.ts`:
-  `export const SUPER_ADMIN_EMAIL = 'epena@fallbrookchurch.com'`
+  `export const SUPER_ADMIN_EMAIL = 'epena@fallbrookchurch.org'`
 - The `Role` union stays three values (`volunteer | event_manager | manager`).
   No `RoleBadge` / `ROLE_LABELS` changes.
 - Seed the account in `src/data/mockData.ts` with a normal base role of
@@ -120,7 +120,7 @@ There is no test runner or ESLint in this project; the CI gate is
 
 1. `npm run lint` (`tsc -b --noEmit`) is clean.
 2. Manual pass:
-   - Log in as `epena@fallbrookchurch.com` → "Users" nav item appears; can
+   - Log in as `epena@fallbrookchurch.org` → "Users" nav item appears; can
      list, add, edit (incl. role change), and delete other users; cannot delete
      self or the super-admin account; cannot duplicate an email.
    - Log in as any other demo account → no "Users" nav item, and navigating to

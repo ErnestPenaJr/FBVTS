@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a privileged super-admin account (`epena@fallbrookchurch.com`) that can list, create, edit, role-change, and delete all other user accounts via a new `/admin` page.
+**Goal:** Add a privileged super-admin account (`epena@fallbrookchurch.org`) that can list, create, edit, role-change, and delete all other user accounts via a new `/admin` page.
 
 **Architecture:** Super admin is a *derived capability tied to a reserved email* — not a fourth role. A `SUPER_ADMIN_EMAIL` constant drives an `isSuperAdmin` flag in `AppContext`, which also lifts the existing `isManager`/`isEventManager` gates. Three guarded admin actions (`adminCreateUser`, `adminUpdateUser`, `adminDeleteUser`) live in `AppContext` next to the other mutations. The UI is a new `Admin` page plus a `UserForm`, both following the existing `Manage`/`SectionCard`/`RoleForm` conventions.
 
@@ -41,7 +41,7 @@ Add this near the top of `src/types.ts`, directly under the existing `ROLE_LABEL
 /** The single reserved developer / super-admin account. Super-admin power is
  *  derived from this email, not from a role, so it can never be self-assigned
  *  through the role switcher. */
-export const SUPER_ADMIN_EMAIL = 'epena@fallbrookchurch.com'
+export const SUPER_ADMIN_EMAIL = 'epena@fallbrookchurch.org'
 ```
 
 - [ ] **Step 2: Type-check**
@@ -105,7 +105,7 @@ Expected: PASS.
 
 - [ ] **Step 5: Manual check**
 
-Run: `npm run dev`, open the app, and on the login screen confirm a new "Ernest Peña — epena@fallbrookchurch.com" account appears in the picker with a Manager badge.
+Run: `npm run dev`, open the app, and on the login screen confirm a new "Ernest Peña — epena@fallbrookchurch.org" account appears in the picker with a Manager badge.
 
 - [ ] **Step 6: Commit**
 
@@ -703,7 +703,7 @@ Expected: type-check + Vite build succeed with no errors.
 
 - [ ] **Step 2: Manual acceptance — super admin**
 
-In `npm run dev`, log in as `epena@fallbrookchurch.com` and verify:
+In `npm run dev`, log in as `epena@fallbrookchurch.org` and verify:
 - "Users" nav item is present; `/admin` lists all accounts.
 - **Add user** creates a new account that appears in the list and in the login picker.
 - **Edit** changes name/phone/bio/role and persists after a page refresh.

@@ -7,5 +7,9 @@ dist-ssr
 .vite
 *.tsbuildinfo
 
+# Local secrets and Netlify state
+.env
+.netlify/
+
 # Visual brainstorm companion
 .superpowers/

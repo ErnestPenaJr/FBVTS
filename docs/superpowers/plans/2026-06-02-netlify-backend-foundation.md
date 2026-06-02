@@ -10,6 +10,15 @@
 
 **Reference spec:** `docs/superpowers/specs/2026-06-02-netlify-backend-foundation-design.md`
 
+## Pre-flight (already verified — 2026-06-02)
+
+- **Netlify CLI 26.1.0** is installed globally and authenticated (Ernest Pena / Tech Team); repo is linked to the `fbvts` project.
+- **Netlify Database is enabled and provisioned** (Neon, PostgreSQL 17.5). `netlify database connect --query "SELECT 1"` succeeds. **No `netlify db init` needed.**
+- The connection string is auto-injected as **`NETLIFY_DATABASE_URL`** (already present in a gitignored `.env`). All DB code reads `process.env.NETLIFY_DATABASE_URL ?? process.env.DATABASE_URL`.
+- **Do NOT install `@netlify/database`** — it bundles the `waddler` query builder, which competes with Drizzle. We use Drizzle + `@neondatabase/serverless` only.
+- `.env` and `.netlify/` are already in `.gitignore`. `.env` currently holds only `NETLIFY_DATABASE_URL`; `JWT_SECRET` and `SUPER_ADMIN_INITIAL_PASSWORD` must be added (Task 3, Step 2).
+- `drizzle-kit` and `tsx` do not auto-load `.env`, so this plan adds `dotenv` and loads it in `drizzle.config.ts` / the seed (which already imports `dotenv/config`).
+
 ---
 
 ## Verification convention (read first)
@@ -68,10 +77,10 @@ The existing super-admin Admin page (`src/pages/Admin.tsx`) and its `adminCreate
 
 - [ ] **Step 1: Install dependencies**
 
-Run:
+Run (Netlify CLI is already installed globally — do **not** add it as a dep, and do **not** install `@netlify/database`):
 ```bash
 npm install drizzle-orm @neondatabase/serverless bcryptjs jose
-npm install -D drizzle-kit @netlify/functions @types/bcryptjs tsx netlify-cli
+npm install -D drizzle-kit @netlify/functions @types/bcryptjs tsx dotenv
 ```
 
 - [ ] **Step 2: Update `package.json` scripts**
@@ -93,13 +102,16 @@ Replace the `scripts` block with:
 - [ ] **Step 3: Create `drizzle.config.ts`**
 
 ```ts
+import 'dotenv/config' // load .env so drizzle-kit sees NETLIFY_DATABASE_URL
 import { defineConfig } from 'drizzle-kit'
+
+const url = process.env.NETLIFY_DATABASE_URL ?? process.env.DATABASE_URL!
 
 export default defineConfig({
   schema: './netlify/db/schema.ts',
   out: './netlify/db/migrations',
   dialect: 'postgresql',
-  dbCredentials: { url: process.env.DATABASE_URL! },
+  dbCredentials: { url },
 })
 ```
 
@@ -130,8 +142,9 @@ Add `{ "path": "./tsconfig.netlify.json" }` to the `references` array in `tsconf
 - [ ] **Step 6: Create `.env.example`**
 
 ```bash
-# Neon Postgres connection string (from Netlify DB / Neon dashboard)
-DATABASE_URL=postgres://user:pass@host/db?sslmode=require
+# Postgres connection string. Netlify auto-injects NETLIFY_DATABASE_URL when
+# Netlify Database is enabled; this is here only as documentation / fallback.
+# NETLIFY_DATABASE_URL=postgres://user:pass@host/db?sslmode=require
 # Secret for signing session JWTs (generate: openssl rand -base64 32)
 JWT_SECRET=
 # Initial password for the bootstrapped super-admin (epena@fallbrookchurch.org).
@@ -139,13 +152,9 @@ JWT_SECRET=
 SUPER_ADMIN_INITIAL_PASSWORD=
 ```
 
-- [ ] **Step 7: Update `.gitignore`**
+- [ ] **Step 7: Verify `.gitignore` (already done)**
 
-Append:
-```
-.env
-.netlify/
-```
+Confirm `.gitignore` already contains `.env` and `.netlify/` (it does — added during setup). Run `git check-ignore .env` → prints `.env`. No change needed; just don't ever commit `.env`.
 
 - [ ] **Step 8: Ensure `netlify.toml` declares the functions directory**
 
@@ -158,7 +167,7 @@ Leave the existing `[build.environment] NODE_VERSION = "22"` and the SPA `[[redi
 - [ ] **Step 9: Type-check**
 
 Run: `npm run lint`
-Expected: PASS (no `netlify/**` files yet; config compiles). If `tsx`/types resolve issues appear, confirm `@types/node` is present (it ships with `netlify-cli`'s peer deps; if missing run `npm i -D @types/node`).
+Expected: PASS (no `netlify/**` files yet; config compiles). The `tsconfig.netlify.json` uses `"types": ["node"]`, so if `tsc` reports it can't find type definitions for `node`, install them: `npm i -D @types/node`.
 
 - [ ] **Step 10: Commit**
 
@@ -312,14 +321,20 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as schema from './schema'
 
-const sql = neon(process.env.DATABASE_URL!)
+const url = process.env.NETLIFY_DATABASE_URL ?? process.env.DATABASE_URL!
+const sql = neon(url)
 export const db = drizzle(sql, { schema })
 export { schema }
 ```
 
-- [ ] **Step 2: Provision the database & set env locally**
+- [ ] **Step 2: Add the remaining env vars (DB already provisioned)**
 
-Provision a Netlify DB (Neon) for the site (Netlify dashboard → Project → Add database → Netlify DB), or create a Neon project directly. Copy its connection string. Create a local `.env` (gitignored) from `.env.example` and fill in `DATABASE_URL` and a generated `JWT_SECRET` (`openssl rand -base64 32`) and a `SUPER_ADMIN_INITIAL_PASSWORD`.
+The Netlify Database is already provisioned and `NETLIFY_DATABASE_URL` is auto-injected (present in the gitignored `.env`). Add the two app secrets the seed/auth need to the same `.env`:
+```bash
+printf '\nJWT_SECRET=%s\n' "$(openssl rand -base64 32)" >> .env
+printf 'SUPER_ADMIN_INITIAL_PASSWORD=%s\n' "<choose-a-strong-password>" >> .env
+```
+Also set both in Netlify for production: `netlify env:set JWT_SECRET "<same-or-new>"` and `netlify env:set SUPER_ADMIN_INITIAL_PASSWORD "<password>"`. (Do not commit `.env`.)
 
 - [ ] **Step 3: Generate the initial migration**
 
@@ -329,7 +344,9 @@ Expected: a new folder/files under `netlify/db/migrations/` containing the `CREA
 - [ ] **Step 4: Apply the migration**
 
 Run: `npm run db:migrate`
-Expected: "migrations applied" with no errors. (Verify in the Neon SQL console that the tables exist.)
+Expected: "migrations applied" with no errors. Verify the tables exist:
+`netlify database connect --query "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY 1;"`
+→ lists `campuses`, `events`, `positions`, `service_times`, `signups`, `users`, `volunteer_roles`.
 
 - [ ] **Step 5: Type-check**
 
@@ -483,7 +500,7 @@ Expected: logs "Seed complete." and the super-admin line. Re-run it — it must 
 
 - [ ] **Step 3: Verify in DB**
 
-In the Neon SQL console: `select count(*) from volunteer_roles;` → 10; `select count(*) from positions;` → 13 (8 service + 5 event); `select email, role from users;` → the super-admin row.
+Using the CLI: `netlify database connect --query "SELECT count(*) FROM volunteer_roles;"` → 10; `... "SELECT count(*) FROM positions;"` → 13 (8 service + 5 event); `... "SELECT email, role FROM users;"` → the super-admin row.
 
 - [ ] **Step 4: Type-check & commit**
 

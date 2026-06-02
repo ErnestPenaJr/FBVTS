@@ -18,6 +18,7 @@ import type {
   User,
   VolunteerRole,
 } from '../types'
+import { SUPER_ADMIN_EMAIL } from '../types'
 import {
   seedCampuses,
   seedEvents,
@@ -66,6 +67,7 @@ interface AppContextValue extends PersistedState {
   currentUser: User | null
   isManager: boolean
   isEventManager: boolean
+  isSuperAdmin: boolean
   // auth
   register: (data: { name: string; email: string; role: Role }) => void
   login: (userId: string) => void
@@ -166,15 +168,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     state.users.find((u) => u.id === state.currentUserId) ?? null
 
   const value = useMemo<AppContextValue>(() => {
+    const superAdmin = currentUser?.email === SUPER_ADMIN_EMAIL
     const update = (patch: Partial<PersistedState>) =>
       setState((s) => ({ ...s, ...patch }))
 
     return {
       ...state,
       currentUser,
-      isManager: currentUser?.role === 'manager',
+      isManager: currentUser?.role === 'manager' || superAdmin,
       isEventManager:
-        currentUser?.role === 'event_manager' || currentUser?.role === 'manager',
+        currentUser?.role === 'event_manager' ||
+        currentUser?.role === 'manager' ||
+        superAdmin,
+      isSuperAdmin: superAdmin,
 
       register: ({ name, email, role }) => {
         const user: User = { id: uid('u'), name, email, role }

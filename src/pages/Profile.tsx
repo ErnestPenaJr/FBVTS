@@ -20,6 +20,7 @@ export function Profile() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(currentUser?.name ?? '')
+  const [email, setEmail] = useState(currentUser?.email ?? '')
   const [phone, setPhone] = useState(currentUser?.phone ?? '')
   const [bio, setBio] = useState(currentUser?.bio ?? '')
 
@@ -90,7 +91,12 @@ export function Profile() {
           <button
             onClick={() => {
               if (editing) {
-                updateProfile({ name: name.trim() || currentUser.name, phone, bio })
+                updateProfile({
+                  name: name.trim() || currentUser.name,
+                  email: email.trim() || currentUser.email,
+                  phone,
+                  bio,
+                })
                 toast('Profile saved')
               }
               setEditing(!editing)
@@ -107,6 +113,15 @@ export function Profile() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+              />
+            </Field>
+            <Field label="Email">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+                placeholder="you@example.com"
               />
             </Field>
             <Field label="Phone">

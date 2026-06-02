@@ -216,12 +216,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
         })),
 
       updateProfile: (patch) =>
-        setState((s) => ({
-          ...s,
-          users: s.users.map((u) =>
-            u.id === s.currentUserId ? { ...u, ...patch } : u,
-          ),
-        })),
+        setState((s) => {
+          const me = s.users.find((u) => u.id === s.currentUserId)
+          const next: Partial<User> = { ...patch }
+          // Defend the super-admin invariant: power is tied to the reserved
+          // email, so self-service profile edits may never claim it, and the
+          // super-admin account's own email is locked.
+          if (next.email !== undefined) {
+            const lower = next.email.trim().toLowerCase()
+            if (
+              lower === SUPER_ADMIN_EMAIL.toLowerCase() ||
+              me?.email === SUPER_ADMIN_EMAIL
+            ) {
+              delete next.email
+            }
+          }
+          return {
+            ...s,
+            users: s.users.map((u) =>
+              u.id === s.currentUserId ? { ...u, ...next } : u,
+            ),
+          }
+        }),
       setFontScale: (fontScale) =>
         update({ settings: { ...state.settings, fontScale } }),
 

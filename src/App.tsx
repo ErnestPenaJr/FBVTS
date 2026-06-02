@@ -8,6 +8,7 @@ import { EventDetail } from './pages/EventDetail'
 import { Schedule } from './pages/Schedule'
 import { Profile } from './pages/Profile'
 import { Manage } from './pages/Manage'
+import { Admin } from './pages/Admin'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { currentUser } = useApp()
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/event/:id" element={<EventDetail />} />
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/manage" element={<Manage />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

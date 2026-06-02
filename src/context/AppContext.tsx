@@ -76,6 +76,13 @@ interface AppContextValue extends PersistedState {
   // profile
   updateProfile: (patch: Partial<User>) => void
   setFontScale: (scale: FontScale) => void
+  // super-admin user management
+  adminCreateUser: (data: { name: string; email: string; role: Role }) => void
+  adminUpdateUser: (
+    id: string,
+    patch: Partial<Pick<User, 'name' | 'email' | 'phone' | 'bio' | 'role'>>,
+  ) => void
+  adminDeleteUser: (id: string) => void
   // volunteer roles (catalog)
   addRole: (data: {
     name: string
@@ -209,6 +216,74 @@ export function AppProvider({ children }: { children: ReactNode }) {
         })),
       setFontScale: (fontScale) =>
         update({ settings: { ...state.settings, fontScale } }),
+
+      adminCreateUser: ({ name, email, role }) =>
+        setState((s) => {
+          const me = s.users.find((u) => u.id === s.currentUserId)
+          if (me?.email !== SUPER_ADMIN_EMAIL) return s
+          const trimmedName = name.trim()
+          const trimmedEmail = email.trim()
+          const lower = trimmedEmail.toLowerCase()
+          if (!trimmedName || !trimmedEmail) return s
+          // the reserved email can never be assigned to a new account
+          if (lower === SUPER_ADMIN_EMAIL.toLowerCase()) return s
+          // emails are unique (case-insensitive)
+          if (s.users.some((u) => u.email.toLowerCase() === lower)) return s
+          const user: User = {
+            id: uid('u'),
+            name: trimmedName,
+            email: trimmedEmail,
+            role,
+          }
+          return { ...s, users: [...s.users, user] }
+        }),
+
+      adminUpdateUser: (id, patch) =>
+        setState((s) => {
+          const me = s.users.find((u) => u.id === s.currentUserId)
+          if (me?.email !== SUPER_ADMIN_EMAIL) return s
+          const target = s.users.find((u) => u.id === id)
+          if (!target) return s
+          const next: Partial<User> = { ...patch }
+          // the super-admin account's own email is locked
+          if (target.email === SUPER_ADMIN_EMAIL) delete next.email
+          if (next.email !== undefined) {
+            const email = next.email.trim()
+            const lower = email.toLowerCase()
+            if (!email) return s
+            // reserved email can't be moved onto another account
+            if (lower === SUPER_ADMIN_EMAIL.toLowerCase()) return s
+            // unique among other users
+            if (
+              s.users.some(
+                (u) => u.id !== id && u.email.toLowerCase() === lower,
+              )
+            )
+              return s
+            next.email = email
+          }
+          return {
+            ...s,
+            users: s.users.map((u) => (u.id === id ? { ...u, ...next } : u)),
+          }
+        }),
+
+      adminDeleteUser: (id) =>
+        setState((s) => {
+          const me = s.users.find((u) => u.id === s.currentUserId)
+          if (me?.email !== SUPER_ADMIN_EMAIL) return s
+          const target = s.users.find((u) => u.id === id)
+          if (!target) return s
+          // never delete the super-admin account or yourself
+          if (target.email === SUPER_ADMIN_EMAIL) return s
+          if (target.id === s.currentUserId) return s
+          return {
+            ...s,
+            users: s.users.filter((u) => u.id !== id),
+            // cascade: remove the deleted user's signups (no orphans)
+            signups: s.signups.filter((g) => g.userId !== id),
+          }
+        }),
 
       addRole: (data) =>
         setState((s) => ({

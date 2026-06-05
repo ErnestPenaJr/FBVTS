@@ -1,5 +1,13 @@
 import { HttpError } from './auth'
 
+export interface PcoEntity {
+  id: string
+  attributes: Record<string, unknown>
+}
+export interface PcoList {
+  data: PcoEntity[]
+}
+
 const BASE = 'https://api.planningcenteronline.com/services/v2'
 
 function authHeader(): string {

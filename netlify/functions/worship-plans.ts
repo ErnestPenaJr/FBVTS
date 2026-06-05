@@ -1,15 +1,7 @@
 import type { Config } from '@netlify/functions'
 import { json, withErrors } from './_lib/http'
 import { requireAuth } from './_lib/auth'
-import { pcoFetch } from './_lib/pco'
-
-interface PcoEntity {
-  id: string
-  attributes: Record<string, unknown>
-}
-interface PcoList {
-  data: PcoEntity[]
-}
+import { pcoFetch, type PcoList } from './_lib/pco'
 
 export interface WorshipPlanDTO {
   id: string

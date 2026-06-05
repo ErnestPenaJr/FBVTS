@@ -11,8 +11,9 @@
     "preview": "vite preview",
     "lint": "tsc -b --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx netlify/db/seed.ts"
+    "db:migrate": "netlify dev:exec drizzle-kit migrate",
+    "db:seed": "tsx netlify/db/seed.ts",
+    "db:studio": "netlify dev:exec drizzle-kit studio"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
